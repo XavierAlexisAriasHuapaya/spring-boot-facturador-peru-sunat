@@ -1,6 +1,8 @@
 package digital.peru.hym.facturador;
 
 import org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import org.w3c.dom.Document;
@@ -17,7 +19,7 @@ import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
+// import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -33,9 +35,10 @@ import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+// import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+@SpringBootApplication
 public class FacturadorApplication {
 
     private final static String ruc = "20607599211";
@@ -52,6 +55,11 @@ public class FacturadorApplication {
     private static boolean production = false;
 
     public static void main(String[] args) {
+		SpringApplication.run(FacturadorApplication.class, args);
+        // this.execute();
+    }
+
+    public void execute(){
         endPointSunat = production ? "https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService"
                 : "https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService";
         codeDocument = invoice ? "01" : "03";
@@ -278,57 +286,57 @@ public class FacturadorApplication {
         }
     }
 
-    private static void unzipAndFormatXML(String zipFilePath, String outputDir) throws IOException {
-        try {
-            File destDir = new File(outputDir);
-            if (!destDir.exists()) destDir.mkdirs();
+    // private static void unzipAndFormatXML(String zipFilePath, String outputDir) throws IOException {
+    //     try {
+    //         File destDir = new File(outputDir);
+    //         if (!destDir.exists()) destDir.mkdirs();
 
-            try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFilePath))) {
-                ZipEntry entry;
-                while ((entry = zis.getNextEntry()) != null) {
-                    String fileName = entry.getName();
-                    File newFile = new File(destDir, fileName);
+    //         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFilePath))) {
+    //             ZipEntry entry;
+    //             while ((entry = zis.getNextEntry()) != null) {
+    //                 String fileName = entry.getName();
+    //                 File newFile = new File(destDir, fileName);
 
-                    try (FileOutputStream fos = new FileOutputStream(newFile)) {
-                        byte[] buffer = new byte[1024];
-                        int len;
-                        while ((len = zis.read(buffer)) > 0) {
-                            fos.write(buffer, 0, len);
-                        }
-                    }
-                    zis.closeEntry();
+    //                 try (FileOutputStream fos = new FileOutputStream(newFile)) {
+    //                     byte[] buffer = new byte[1024];
+    //                     int len;
+    //                     while ((len = zis.read(buffer)) > 0) {
+    //                         fos.write(buffer, 0, len);
+    //                     }
+    //                 }
+    //                 zis.closeEntry();
 
-                    if (fileName.endsWith(".xml")) {
-                        formatXML(newFile);
-                    }
+    //                 if (fileName.endsWith(".xml")) {
+    //                     formatXML(newFile);
+    //                 }
 
-                    System.out.println("Archivo extraído: " + newFile.getAbsolutePath());
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-    }
+    //                 System.out.println("Archivo extraído: " + newFile.getAbsolutePath());
+    //             }
+    //         }
+    //     } catch (Exception e) {
+    //         System.out.println("Error: " + e.getMessage());
+    //     }
+    // }
 
-    private static void formatXML(File xmlFile) {
-        try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.parse(xmlFile);
+    // private static void formatXML(File xmlFile) {
+    //     try {
+    //         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    //         DocumentBuilder db = dbf.newDocumentBuilder();
+    //         Document doc = db.parse(xmlFile);
 
-            TransformerFactory tf = TransformerFactory.newInstance();
-            Transformer transformer = tf.newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+    //         TransformerFactory tf = TransformerFactory.newInstance();
+    //         Transformer transformer = tf.newTransformer();
+    //         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+    //         transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
-            DOMSource source = new DOMSource(doc);
-            StreamResult result = new StreamResult(xmlFile);
-            transformer.transform(source, result);
-            System.out.println("XML formateado correctamente: " + xmlFile.getAbsolutePath());
-        } catch (Exception e) {
-            System.out.println("Error formateando XML: " + xmlFile.getName());
-        }
-    }
+    //         DOMSource source = new DOMSource(doc);
+    //         StreamResult result = new StreamResult(xmlFile);
+    //         transformer.transform(source, result);
+    //         System.out.println("XML formateado correctamente: " + xmlFile.getAbsolutePath());
+    //     } catch (Exception e) {
+    //         System.out.println("Error formateando XML: " + xmlFile.getName());
+    //     }
+    // }
 
     private static void removeLineBreaks(Document doc, String tagName) {
         NodeList nodeList = doc.getElementsByTagName(tagName);

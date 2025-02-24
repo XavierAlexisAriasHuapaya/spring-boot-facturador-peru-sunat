@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: electronic-document-digital-peru
+
+
+server:
+  servlet:
+    context-path: /api
+  port: 8080
